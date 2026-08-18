@@ -6,10 +6,22 @@ import { AuthService } from './auth.service';
 import { AccountsController } from './accounts.controller';
 import { TransactionsController } from './transactions.controller';
 import { CoupleController } from './couple.controller';
+import { CategoriesController } from './categories.controller';
+import { TransfersController } from './transfers.controller';
+import { ActivityController } from './activity.controller';
+import { JwtAuthGuard } from './auth.guard';
 
 @Module({
   imports: [JwtModule.register({ secret: process.env.JWT_SECRET || 'dev-only-change-me', signOptions: { expiresIn: '7d' } })],
-  controllers: [AuthController, AccountsController, TransactionsController, CoupleController],
-  providers: [PrismaService, AuthService],
+  controllers: [
+    AuthController,
+    AccountsController,
+    TransactionsController,
+    CoupleController,
+    CategoriesController,
+    TransfersController,
+    ActivityController
+  ],
+  providers: [PrismaService, AuthService, JwtAuthGuard],
 })
 export class AppModule {}

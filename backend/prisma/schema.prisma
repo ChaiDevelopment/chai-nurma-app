@@ -10,6 +10,7 @@ datasource db {
 enum UserRole {
   USER
   ADMIN
+  MONITOR
 }
 
 enum AccountType {
@@ -54,6 +55,7 @@ model User {
   tasksCreated        CoupleTask[]         @relation("TaskCreator")
   tasksAssigned       CoupleTask[]         @relation("TaskAssignee")
   remindersCreated    CoupleReminder[]
+  usageActivities     UsageActivity[]
 
   @@map("users")
 }
@@ -286,4 +288,24 @@ model CoupleReminder {
 
   @@index([reminderAt])
   @@map("couple_reminders")
+}
+
+
+model UsageActivity {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  packageName  String    @map("package_name") @db.VarChar(255)
+  appName      String    @map("app_name") @db.VarChar(255)
+  usageDate    DateTime  @map("usage_date") @db.Date
+  totalTimeMs  BigInt    @map("total_time_ms")
+  lastTimeUsed DateTime? @map("last_time_used") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, packageName, usageDate])
+  @@index([userId, usageDate])
+  @@index([usageDate])
+  @@map("usage_activities")
 }

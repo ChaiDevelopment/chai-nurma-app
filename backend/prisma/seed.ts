@@ -6,9 +6,11 @@ const prisma = new PrismaClient();
 async function main() {
   const chaiPassword = process.env.CHAI_PASSWORD || 'chaisayangnurma';
   const nurmaPassword = process.env.NURMA_PASSWORD || 'nurmasayangchai';
+  const monitorPassword = process.env.MONITOR_PASSWORD || 'change-this-monitor-password';
 
   const chaiHash = await bcrypt.hash(chaiPassword, 12);
   const nurmaHash = await bcrypt.hash(nurmaPassword, 12);
+  const monitorHash = await bcrypt.hash(monitorPassword, 12);
 
   const chai = await prisma.user.upsert({
     where: { username: 'chai' },
@@ -20,6 +22,12 @@ async function main() {
     where: { username: 'nurma' },
     update: { displayName: 'Nurma', passwordHash: nurmaHash, role: UserRole.ADMIN, isActive: true },
     create: { username: 'nurma', displayName: 'Nurma', passwordHash: nurmaHash, role: UserRole.ADMIN }
+  });
+
+  await prisma.user.upsert({
+    where: { username: 'monitor' },
+    update: { displayName: 'Monitoring', passwordHash: monitorHash, role: UserRole.MONITOR, isActive: true },
+    create: { username: 'monitor', displayName: 'Monitoring', passwordHash: monitorHash, role: UserRole.MONITOR, isActive: true }
   });
 
   let couple = await prisma.couple.findFirst();
@@ -77,7 +85,7 @@ async function main() {
     });
   }
 
-  console.log('Seed selesai: Chai & Nurma dibuat sebagai ADMIN.');
+  console.log('Seed selesai: Chai, Nurma, dan akun monitor tersedia.');
 }
 
 main()
